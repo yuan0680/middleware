@@ -3,6 +3,13 @@ class VoiceAssistant {
     // 1.构造函数 - 初始化语音助手实例，接收API密钥作为参数
 
     constructor(apiKey) {
+      // 从localStorage恢复状态
+  const savedHistory = localStorage.getItem('conversationHistory');
+  if (savedHistory) {
+    this.conversationHistory = JSON.parse(savedHistory);
+  }
+        this.initMiniProgramCommunication();
+        this.initMessageListener();
         this.setupFloatingControls = this.setupFloatingControls.bind(this);
         this.recognition = null;
         this.isListening = false;
@@ -14,7 +21,7 @@ class VoiceAssistant {
         this.hasUserPermission = false;
         this.canvas = document.getElementById('waveform');
         this.ctx = this.canvas?.getContext('2d') || null;
-        // this.apiKey = apiKey;
+        this.apiKey = apiKey;
         this.speechEndRestartTimer = null; // 语音播报后重启计时器
         this.conversationHistory = [
             {
@@ -40,7 +47,128 @@ class VoiceAssistant {
             this.initSpeechRecognition();
         }, 1000);
     }
+// 每次对话后保存状态
+processCommand(command) {
+  // ...处理逻辑
+  localStorage.setItem('conversationHistory', JSON.stringify(this.conversationHistory));
+}
+  // 新增：初始化消息监听
+  initMessageListener() {
+    // 监听小程序通过 postMessage 发送的消息
+    if (window.addEventListener) {
+      window.addEventListener('message', (e) => this.handleMiniProgramMessage(e), false);
+    } else if (window.attachEvent) { // 兼容旧浏览器
+      window.attachEvent('onmessage', (e) => this.handleMiniProgramMessage(e));
+    }
+    console.log('✅ 已初始化小程序消息监听');
+  }
 
+  // 新增：处理小程序消息
+  handleMiniProgramMessage(event) {
+    const { type, data } = event.data;
+    console.log(`📩 收到小程序消息: ${type}`, data);
+
+    // 根据消息类型执行对应操作
+    switch (type) {
+      case 'START_LISTENING':
+        this.startListening(); // 开始语音识别
+        break;
+      case 'STOP_LISTENING':
+        this.stopListening(); // 中断语音识别
+        break;
+      case 'CHANGE_PAGE':
+        this.navigateToPage(data.url); // 跳转页面
+        break;
+      case 'ADJUST_VOLUME':
+        this.setVolume(data.volume); // 调整音量
+        break;
+      case 'TOGGLE_ASSISTANT':
+        this.toggleAssistantVisibility(); // 显示/隐藏助手面板
+        break;
+      default:
+        console.warn(`⚠️ 未知消息类型: ${type}`);
+    }
+  }
+ // 新增：开始监听（语音识别）
+  startListening() {
+    if (this.isListening) {
+      console.log('⏸️ 已在监听中，无需重复开始');
+      return;
+    }
+    if (!this.recognition) {
+      this.initSpeechRecognition(); // 初始化识别器
+      // 延迟启动，确保初始化完成
+      setTimeout(() => this.recognition.start(), 500);
+    } else {
+      this.recognition.start();
+    }
+  }
+
+  // 新增：停止监听（中断语音识别）
+  stopListening() {
+    if (!this.isListening || !this.recognition) return;
+    this.recognition.stop();
+    this.isListening = false;
+    this.stopWaveformAnimation();
+    console.log('⏹️ 已停止语音识别');
+    this.updateUI('idle', '已中断识别');
+  }
+// 新增：跳转页面（修改 iframe  src）
+navigateToPage(url) {
+  if (!url) {
+    console.error('❌ 页面跳转失败：URL 为空');
+    return;
+  }
+  const contentFrame = document.getElementById('contentFrame');
+  if (contentFrame) {
+    contentFrame.src = url; // 更新 iframe 地址
+    console.log(`🔗 已跳转至页面: ${url}`);
+    // 可选：通知小程序跳转成功
+    this.postMessageToMiniProgram('PAGE_CHANGED', { url });
+  } else {
+    console.error('❌ 未找到 contentFrame 元素');
+  }
+}
+
+// 新增：向小程序发送消息（可选，用于回传状态）
+postMessageToMiniProgram(type, data) {
+  if (window.parent) {
+    window.parent.postMessage({ type, data }, '*'); // 注意：生产环境需限制 origin
+    console.log(`📤 向小程序发送消息: ${type}`, data);
+  }
+}
+
+// 新增：调整音量（支持背景音乐和语音）
+setVolume({ type, value }) {
+  if (value < 0 || value > 1) {
+    console.error('❌ 音量值必须在 0-1 之间');
+    return;
+  }
+  // 调整背景音乐音量
+  if (type === 'background') {
+    const bgMusic = document.getElementById('backgroundMusic');
+    if (bgMusic) {
+      bgMusic.volume = value;
+      console.log(`🔊 背景音乐音量已调整为: ${value}`);
+    }
+  }
+  // 调整语音播报音量（需结合语音合成逻辑）
+  else if (type === 'speech') {
+    this.speechVolume = value; // 存储音量值，在语音合成时使用
+    console.log(`🔊 语音播报音量已调整为: ${value}`);
+  }
+}
+// 新增：切换助手面板可见性
+toggleAssistantVisibility() {
+  const container = document.getElementById('assistantContainer');
+  if (container) {
+    const isHidden = container.style.display === 'none' || !container.style.display;
+    container.style.display = isHidden ? 'block' : 'none';
+    console.log(`🖥️ 助手面板已${isHidden ? '显示' : '隐藏'}`);
+  } else {
+    console.error('❌ 未找到 assistantContainer 元素');
+  }
+}
 
     // 2.初始化语音识别 - 设置语音识别功能
     initSpeechRecognition() {
