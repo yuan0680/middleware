@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能交通</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../try.css">
+    <script src="../try.js"  defer></script>
+    <style>
+
+    </style>
+
+</head>
+
+<body>
+    <iframe id="contentFrame" src="../../pages/index/index.wxml"></iframe>
+     <!-- 替换为第一个文件中的AI助手样式 -->
+     <div class="voice-icon-container" id="voiceAssistant">
+        <div class="voice-icon-glow"></div>
+        <img src="../images/tubiao3.gif" alt="语音助手" class="voice-icon" id="voiceIcon">
+        <div class="expanding-circle expanding-circle-1"></div>
+        <div class="expanding-circle expanding-circle-2"></div>
+        <div class="expanding-circle expanding-circle-3"></div>
+        <div class="expanding-circle expanding-circle-4"></div>
+        <div class="expanding-circle expanding-circle-5"></div>
+        <div class="outer-glow outer-glow-1"></div>
+        <div class="outer-glow outer-glow-2"></div>
+        <div class="outer-glow outer-glow-3"></div>
+        <div class="outer-glow outer-glow-4"></div>
+        <div class="icon-status-indicator"></div>
+    </div>
+       <!-- 修改助手容器，添加初始隐藏样式 -->
+       <div class="assistant-container" id="assistantContainer" style="display: none;">
+
+        <div class="assistant-header">
+            <div class="assistant-title">小瞳同学智能语音助手</div>
+            <div class="assistant-controls">
+                <button class="control-btn minimize-btn">−</button>
+                <button class="control-btn close-btn">×</button>
+            </div>
+        </div>
+        <div class="api-status" id="apiStatus">
+            <span class="connected"></span>
+            <span>API已连接</span>
+        </div>
+        
+        <div class="visualizer">
+            <canvas class="waveform" id="waveform"></canvas>
+        </div>
+        
+        <button class="mic-button" id="toggleBtn">
+            <i class="fas fa-microphone"></i>
+        </button>
+        
+        <div class="transcript-container" id="transcript">
+            <div class="message assistant-message">
+                <div class="message-header">
+                    <i class="fas fa-robot"></i>
+                    <span>小瞳同学</span>
+                </div>
+                <div class="message-content">
+                    正在初始化，请稍候...
+                </div>
+            </div>
+        </div>
+        
+        <div class="voice-controls">
+            <div class="control-group">
+                <label>语音选择:</label>
+                <select id="voiceSelect"></select>
+            </div>
+            
+            <div class="control-group">
+                <label>背景音乐音量:</label>
+                <input type="range" id="backgroundMusicControl" min="0" max="1" step="0.05" value="0.3">
+            </div>
+            
+            <div class="control-group">
+                <label>语速 (Rate):</label>
+                <input type="range" id="rateControl" min="0.5" max="2" step="0.1" value="1">
+            </div>
+            
+            <div class="control-group">
+                <label>朗读音量:</label>
+                <input type="range" id="volumeControl" min="0" max="1" step="0.05" value="1">
+            </div>
+        </div>
+    </div>
+</div>>
+    </div>
+ <!-- 背景音乐 -->
+<audio id="backgroundMusic" loop autoplay>
+    <source src="../music/gaoshanliushui.mp3" type="audio/mpeg">
+
+</audio>
+
+</body>
+</html>小瞳

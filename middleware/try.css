@@ -1,0 +1,990 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    overflow: hidden;
+    height: 100%;
+}
+
+
+
+#contentFrame {
+    width: 100%;
+    height: 100vh;
+    border: none;
+}
+
+.voice-assistant {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 380px;
+    z-index: 1000;
+}
+
+.icon {
+    font-size: 2.5rem;
+    cursor: pointer;
+    text-align: center;
+    position: relative;
+    right: -100px;
+    user-select: none;
+}
+
+
+
+.assistant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+/* 修复标题样式 */
+.assistant-title {
+    font-weight: bold;
+    font-size: 18px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff !important; /* 改为白色文字确保可见 */
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5); /* 增强文字阴影 */
+    z-index: 12;
+    margin: 0;
+    /* 移除冲突的渐变文字样式 */
+    -webkit-text-fill-color: initial;
+    background-clip: initial;
+    -webkit-background-clip: initial;
+}
+
+/* 增强控制组可见性 */
+.voice-controls {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.control-group {
+    margin-bottom: 8px;
+}
+
+.control-group label {
+    font-weight: 600;
+    color: #444;
+}
+
+/* 增强滑块可见性 */
+input[type=range] {
+    background: #e9ecef;
+    height: 6px;
+    border-radius: 3px;
+}
+
+/* 增强下拉菜单可见性 */
+select {
+    background: white;
+    border: 1px solid #ced4da;
+}
+
+
+.control-btn {
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    font-size: 1.2rem;
+    margin-left: 8px;
+    color: #666;
+}
+
+.assistant-avatar {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.avatar {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+.status-indicator {
+    text-align: center;
+    margin-bottom: 8px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 13px;
+    display: inline-block;
+}
+
+.status-idle {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.status-listening {
+    background: #e8f5e9;
+    color: #4CAF50;
+}
+
+.status-processing {
+    background: #fff3e0;
+    color: #FF9800;
+}
+
+.visualizer {
+    height: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.waveform {
+    width: 100%;
+    height: 100%;
+}
+
+.mic-button {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 8px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.mic-button.listening {
+    background: linear-gradient(135deg, #FF9800, #f44336);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.transcript-container {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    height: 180px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    scroll-behavior: smooth;
+}
+
+.message {
+    margin-bottom: 12px;
+    padding: 12px 15px;
+    border-radius: 10px;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+    line-height: 1.5;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.user-message {
+    background: #e0f2fe;
+    border-left: 4px solid #2196F3;
+    margin-left: 15px;
+}
+
+.assistant-message {
+    background: #dcfce7;
+    border-left: 4px solid #4CAF50;
+    margin-right: 15px;
+}
+
+.error-message {
+    background: #fee2e2;
+    border-left: 4px solid #f44336;
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.message-content {
+    padding-left: 24px;
+    font-size: 15px;
+}
+
+.voice-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.control-group label {
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+select, input[type=range] {
+    width: 100%;
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+/* 思考指示器 */
+.thinking-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #4b5563;
+    padding: 8px 12px;
+    background: #f3f4f6;
+    border-radius: 50px;
+    font-size: 13px;
+}
+
+.thinking-indicator span {
+    animation: blink 1.4s infinite;
+    animation-fill-mode: both;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.thinking-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.thinking-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes blink {
+    0% { opacity: 0.2; }
+    20% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
+/* API状态指示器 */
+.api-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 8px;
+}
+
+.api-status.disconnected {
+    background: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+}
+
+.api-status span {
+    width: 65px;
+    height: 15px;
+    border-radius: 80%;
+    display: block;
+}
+
+.api-status .connected {
+    width: 15px;
+    height: 15px;
+    background: #4CAF50;
+}
+
+.api-status .disconnected {
+    background: #f44336;
+}
+/* 语音助手图标专用样式 - 避免命名冲突 */
+.voice-icon-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 5px 25px rgba(67, 97, 238, 0.8);
+    z-index: 1000;
+    transition: all 1s ease;
+    overflow: hidden;
+}
+
+/* 基础悬浮效果 */
+.voice-icon-container:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 30px rgba(67, 97, 238, 1);
+}
+
+/* 图标样式 */
+.voice-icon-container .voice-icon {
+    margin-top: 15px;
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    z-index: 10;
+    transition: all 1s ease;
+}
+
+/* 明亮无透明度的渐变背景 */
+.voice-icon-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at var(--color-pos1, 50% 50%), 
+            var(--current-color1, #ff6b6b) 0%, 
+            transparent 35%),
+        radial-gradient(circle at var(--color-pos2, 30% 30%), 
+            var(--current-color2, #4ecdc4) 0%, 
+            transparent 40%),
+        radial-gradient(circle at var(--color-pos3, 70% 70%), 
+            var(--current-color3, #45b7d1) 0%, 
+            transparent 38%),
+        radial-gradient(circle at var(--color-pos4, 20% 80%), 
+            var(--current-color4, #feca57) 0%, 
+            transparent 42%),
+        radial-gradient(circle at var(--color-pos5, 80% 20%), 
+            var(--current-color5, #0056ff) 0%, 
+            transparent 36%);
+    border-radius: 50%;
+    z-index: 1;
+    animation: 
+        voice-icon-colorTransition 25s ease-in-out infinite,
+        voice-icon-seamlessFlow 18s ease-in-out infinite,
+        voice-icon-seamlessBrightness 10s ease-in-out infinite;
+    mix-blend-mode: screen;
+    filter: brightness(var(--brightness, 1.2)) saturate(1.4);
+}
+
+/* 颜色过渡动画 */
+@keyframes voice-icon-colorTransition {
+    0% {
+        --current-color1: #ff6b6b;
+        --current-color2: #4ecdc4;
+        --current-color3: #45b7d1;
+        --current-color4: #feca57;
+        --current-color5: #ff9ff3;
+    }
+    10% {
+        --current-color1: #ff8e8e;
+        --current-color2: #6bffea;
+        --current-color3: #5dc9e5;
+        --current-color4: #ffd87c;
+        --current-color5: #ffb3f5;
+    }
+    20% {
+        --current-color1: #ff5252;
+        --current-color2: #00d4c8;
+        --current-color3: #2a9df4;
+        --current-color4: #ffc145;
+        --current-color5: #ff85e6;
+    }
+    30% {
+        --current-color1: #ff3838;
+        --current-color2: #00f5e1;
+        --current-color3: #1e90ff;
+        --current-color4: #ffb732;
+        --current-color5: #ff6bd9;
+    }
+    40% {
+        --current-color1: #ff1a1a;
+        --current-color2: #00fff2;
+        --current-color3: #007bff;
+        --current-color4: #ffaa00;
+        --current-color5: #ff4dcc;
+    }
+    50% {
+        --current-color1: #ff0000;
+        --current-color2: #00fffb;
+        --current-color3: #0056ff;
+        --current-color4: #ff9500;
+        --current-color5: #ff2ebf;
+    }
+    60% {
+        --current-color1: #ff3838;
+        --current-color2: #00f5e1;
+        --current-color3: #1e90ff;
+        --current-color4: #极简b732;
+        --current-color5: #ff6bd9;
+    }
+    70% {
+        --current-color1: #ff5252;
+        --current-color2: #00d4c8;
+        --current-color3: #2a9df4;
+        --current-color4: #ffc145;
+        --current-color5: #ff85e6;
+    }
+    80% {
+        --current-color1: #ff8e8e;
+        --current-color2: #6bffea;
+        --current-color3: #5dc9e5;
+        --current-color4: #ffd87c;
+        --current-color5: #ffb3f5;
+    }
+    90% {
+        --current-color1: #ffa8a8;
+        --current-color2: #8afff0;
+        --current-color3: #7dd3f0;
+        --current-color4: #ffe596;
+        --current-color5: #ffc9f8;
+    }
+    100% {
+        --current-color1: #ff6b6b;
+        --current-color2: #4ecdc4;
+        --current-color3: #45b7d1;
+        --current-color4: #feca57;
+        --current-color5: #ff9ff3;
+    }
+}
+
+@keyframes voice-icon-seamlessFlow {
+    0%, 100% {
+        --color-pos1: 50% 50%;
+        --color-pos2: 30% 30%;
+        --color-pos3: 70% 70%;
+        --color-pos4: 20% 80%;
+        --color-pos5: 80% 20%;
+    }
+    25% {
+        --color-pos1: 55% 45%;
+        --color-pos2: 35% 25%;
+        --color-pos3: 65% 75%;
+        --color-pos4: 25% 75%;
+        --color-pos5: 75% 25%;
+    }
+    50% {
+        --color-pos1: 45% 55%;
+        --color-pos2: 25% 35%;
+        --color-pos3: 75% 65%;
+        --color-pos4: 15% 85%;
+        --color-pos5: 85% 15%;
+    }
+    75% {
+        --color-pos1: 52% 48%;
+        --color-pos2: 32% 28%;
+        --color-pos3: 68% 72%;
+        --color-pos4: 22% 78%;
+        --color-pos5: 78% 22%;
+    }
+}
+
+@keyframes voice-icon-seamlessBrightness {
+    0%, 100% {
+        --brightness: 1.2;
+    }
+    50% {
+        --brightness: 1.4;
+    }
+}
+
+/* 明亮的高光叠加层 */
+.voice-icon-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 50% 50%, 
+            rgba(255, 255, 255, 0.8) 0%, 
+            transparent 70%);
+    border-radius: 50%;
+    z-index: 2;
+    mix-blend-mode: overlay;
+    animation: voice-icon-seamlessWhite 6s ease-in-out infinite;
+}
+
+@keyframes voice-icon-seamlessWhite {
+    0%, 100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 0.9;
+    }
+}
+
+/* 明亮的外发光 */
+.voice-icon-glow {
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    background: 
+        radial-gradient(circle at var(--glow-pos1, 30% 30%), 
+            var(--glow-color1, #ff6b6b) 0%, 
+            transparent 55%),
+        radial-gradient(circle at var(--glow-pos2, 70% 70%), 
+            var(--glow-color2, #4ecdc4) 0%, 
+            transparent 50%),
+        radial-gradient(circle at var(--glow-pos3, 50% 50%), 
+            var(--glow-color3, #ff9ff3) 0%, 
+            transparent 60%);
+    border-radius: 50%;
+    z-index: -1;
+    animation: 
+        voice-icon-glowColorTransition 25s ease-in-out infinite,
+        voice-icon-glowFlow 18s ease-in-out infinite;
+    filter: blur(25px) brightness(1.3);
+    mix-blend-mode: screen;
+    opacity: 0.9;
+}
+
+@keyframes voice-icon-glowColorTransition {
+    0% {
+        --glow-color1: #ff6b6b;
+        --glow-color2: #4ecdc4;
+        --glow-color3: #ff9ff3;
+    }
+    25% {
+        --glow-color1: #4ecdc4;
+        --glow-color2: #45b7d1;
+        --glow-color3: #ff9ff3;
+    }
+    50% {
+        --glow-color1: #45b7d1;
+        --glow-color2: #feca57;
+        --glow-color3: #ff6b6b;
+    }
+    75% {
+        --glow-color1: #feca57;
+        --glow-color2: #ff9ff3;
+        --glow-color3: #4ecdc4;
+    }
+    100% {
+        --glow-color1: #ff9ff3;
+        --glow-color2: #ff6b6b;
+        --glow-color3: #4ecdc4;
+    }
+}
+
+@keyframes voice-icon-glowFlow {
+    0%, 100% {
+        --glow-pos1: 30% 30%; --glow-pos2: 70% 70%; --glow-pos3: 50% 50%;
+    }
+    33% {
+        --glow-pos1: 35% 25%; --glow-pos2: 65% 75%; --glow-pos3: 45% 55%;
+    }
+    66% {
+        --glow-pos1: 25% 35%; --glow-pos2: 75% 65%; --glow-pos3: 55% 45%;
+    }
+}
+
+/* 向外扩散的圆圈效果 */
+.voice-expanding-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid;
+    opacity: 0;
+    z-index: -2;
+}
+
+.voice-expanding-circle-1 {
+    border-color: #ff6b6b;
+    animation: voice-expand-circle 3s ease-out infinite;
+}
+
+.voice-expanding-circle-2 {
+    border-color: #4ecdc4;
+    animation: voice-expand-circle 3s ease-out 0.6s infinite;
+}
+
+.voice-expanding-circle-3 {
+    border-color: #45b7d1;
+    animation: voice-expand-circle 3s ease-out 1.2s infinite;
+}
+
+.voice-expanding-circle-4 {
+    border-color: #feca57;
+    animation: voice-expand-circle 3s ease-out 1.8s infinite;
+}
+
+.voice-expanding-circle-5 {
+    border-color: #ff9ff3;
+    animation: voice-expand-circle 3s ease-out 2.4s infinite;
+}
+
+@keyframes voice-expand-circle {
+    0% {
+        width: 80px;
+        height: 80px;
+        opacity: 0.8;
+        border-width: 2px;
+    }
+    20% {
+        opacity: 0.6;
+        border-width: 1.5px;
+    }
+    40% {
+        opacity: 0.4;
+        border-width: 1px;
+    }
+    60% {
+        opacity: 0.3;
+        border-width: 0.8px;
+    }
+    80% {
+        opacity: 0.2;
+        border-width: 0.5px;
+    }
+    100% {
+        width: 250px;
+        height: 250px;
+        opacity: 0;
+        border-width: 0.2px;
+    }
+}
+
+/* 圆圈外侧透明光影效果 */
+.voice-outer-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    z-index: -3;
+    opacity: 0.6;
+    filter: blur(15px);
+}
+
+.voice-outer-glow-1 {
+    background: radial-gradient(circle, rgba(255, 107, 107, 0.3) 0%, transparent 70%);
+    animation: voice-outerGlowPulse 8s ease-in-out infinite;
+}
+
+.voice-outer-glow-2 {
+    background: radial-gradient(circle, rgba(78, 205, 196, 0.3) 0%, transparent 70%);
+    animation: voice-outerGlowPulse 8s ease-in-out 2s infinite;
+}
+
+.voice-outer-glow-3 {
+    background: radial-gradient(circle, rgba(255, 159, 243, 0.3) 0%, transparent 70%);
+    animation: voice-outerGlowPulse 8s ease-in-out 4s infinite;
+}
+
+.voice-outer-glow-4 {
+    background: radial-gradient(circle, rgba(254, 202, 87, 0.3) 0%, transparent 70%);
+    animation: voice-outerGlowPulse 8s ease-in-out 6s infinite;
+}
+
+@keyframes voice-outerGlowP极简 {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.6;
+    }
+}
+
+/* 点击效果 */
+.voice-icon-container:active {
+    transform: scale(0.95);
+    box-shadow: 0 3px 20px rgba(67, 97, 238, 0.9);
+}
+
+/* 状态指示器 */
+.voice-status-indicator {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #4ecdc4;
+    box-shadow: 0 0 25px #4ecdc4;
+    z-index: 11;
+    animation: voice-seamlessIndicatorColor 6s ease-in-out infinite;
+}
+
+@keyframes voice-seamlessIndicatorColor {
+    0%, 100% {
+        background: #4ecdc4;
+        box-shadow: 0 0 25px #4ecdc4;
+    }
+    25% {
+        background: #45b7d1;
+        box-shadow: 0 0 25px #45b7d1;
+    }
+    50% {
+        background: #55efc4;
+        box-shadow: 0 0 25px #55efc4;
+    }
+    75% {
+        background: #74b9ff;
+        box-shadow: 0 0 25px 
+    }
+}
+
+/* 不同状态下的图标效果 */
+.voice-icon-container.idle .voice-icon {
+    animation: voice-seamlessIdle 6s ease-in-out infinite;
+}
+
+.voice-icon-container.listening .voice-icon {
+    animation: voice-seamlessListening 2s ease-in-out infinite;
+}
+
+.voice-icon-container.thinking .voice-icon {
+    animation: voice-seamlessThinking 4s ease-in-out infinite;
+}
+
+.voice-icon-container.speaking .voice-icon {
+    animation: voice-seamlessSpeaking 1.5s ease-in-out infinite;
+}
+
+.voice-icon-container.error .voice-icon {
+    animation: voice-seamlessError 2s ease-in-out infinite;
+}
+
+@keyframes voice-seamlessIdle {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        filter: brightness(1.2) drop-shadow(0 0 12px rgba(255, 255, 255, 0.6));
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.02);
+        filter: brightness(1.3) drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+    }
+}
+
+@keyframes voice-seamlessListening {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        filter: brightness(1.3) drop-shadow(0 0 15px #4ecdc4);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.08);
+        filter: brightness(1.5) drop-shadow(0 0 20px #4ecdc4);
+    }
+}
+
+@keyframes voice-seamlessThinking {
+    0%, 100% {
+        transform: translate(-50%, -50%) rotate(0deg) scale(1);
+        filter: brightness(1.2) drop-shadow(0 0 12px #feca57);
+    }
+    25% {
+        transform: translate(-50%, -50%) rotate(6deg) scale(1.02);
+        filter: brightness(1.4) drop-shadow(0 0 15px #feca57);
+    }
+    75% {
+        transform: translate(-50%, -50%) rotate(-6deg) scale(1.02);
+        filter: brightness(1.4) drop-shadow(0 0 15px #feca57);
+    }
+}
+
+@keyframes voice-seamlessSpeaking {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        filter: brightness(1.3) drop-shadow(0 0 15px #45b7d1);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.12);
+        filter: brightness(1.6) drop-shadow(0 0 22px #45b7d1);
+    }
+}
+
+@keyframes voice-seamlessError {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        filter: brightness(1.3) drop-shadow(0 0 15px #ff6b6b);
+    }
+    25% {
+        transform: translate(-50%, -50%) translateX(-3px) scale(1.02);
+        filter: brightness(1.5) drop-shadow(0 0 18px #ff6b6b);
+    }
+    75% {
+        transform: translate(-50%, -50%) translateX(3px) scale(1.02);
+        filter: brightness(1.5) drop-shadow(0 0 18px #ff6b6b);
+    }
+}
+
+@media (max-width: 600px) {
+    .voice-icon-container {
+        width: 70px;
+        height: 70px;
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .voice-icon-container .voice-icon {
+        width: 70px;
+        height: 70px;
+    }
+    
+    @keyframes voice-expand-circle {
+        0% {
+            width: 70px;
+            height: 70px;
+            opacity: 0.8;
+            border-width: 2px;
+        }
+        100% {
+            width: 200px;
+            height: 200px;
+            opacity: 0;
+            border-width: 0.2px;
+        }
+    }
+}
+
+/* 原有面板样式保持不变（以下样式保持不变） */
+.voice-assistant {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 380px;
+    z-index: 1000;
+}
+
+.icon {
+    font-size: 2.5rem;
+    cursor: pointer;
+    text-align: center;
+    position: relative;
+    right: -100px;
+    user-select: none;
+}
+
+.assistant-container {
+    display: none;
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: fixed;
+
+    max-height: 700px;
+    overflow: hidden;
+   
+    z-index: 10000 !important;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* ... 其余面板样式保持不变 ... */
+
+/* 悬浮窗 */
+        /* 悬浮窗 */
+        .assistant-container {
+            position: fixed;
+            top: 55%;
+            left: 85%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+            overflow: visible; /* 重要：允许内容溢出 */
+        }
+        
+        .assistant-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 20px 20px; /* 增加上边距为控制按钮留空间 */
+            text-align: center;
+            position: relative;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .assistant-controls {
+            position: absolute;
+            top: -20px; /* 移动到小助手窗口正上方 */
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 1000;
+        }
+        
+        .control-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            font-size: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .control-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(102, 126, 234, 0.4);
+        }
+        
+        .minimize-btn {
+            font-size: 18px;
+        }
+        
+        .close-btn {
+            font-size: 20px;
+        }
