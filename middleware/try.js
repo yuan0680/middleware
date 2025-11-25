@@ -3,13 +3,6 @@ class VoiceAssistant {
     // 1.构造函数 - 初始化语音助手实例，接收API密钥作为参数
 
     constructor(apiKey) {
-      // 从localStorage恢复状态
-  const savedHistory = localStorage.getItem('conversationHistory');
-  if (savedHistory) {
-    this.conversationHistory = JSON.parse(savedHistory);
-  }
-        this.initMiniProgramCommunication();
-        this.initMessageListener();
         this.setupFloatingControls = this.setupFloatingControls.bind(this);
         this.recognition = null;
         this.isListening = false;
@@ -47,128 +40,7 @@ class VoiceAssistant {
             this.initSpeechRecognition();
         }, 1000);
     }
-// 每次对话后保存状态
-processCommand(command) {
-  // ...处理逻辑
-  localStorage.setItem('conversationHistory', JSON.stringify(this.conversationHistory));
-}
-  // 新增：初始化消息监听
-  initMessageListener() {
-    // 监听小程序通过 postMessage 发送的消息
-    if (window.addEventListener) {
-      window.addEventListener('message', (e) => this.handleMiniProgramMessage(e), false);
-    } else if (window.attachEvent) { // 兼容旧浏览器
-      window.attachEvent('onmessage', (e) => this.handleMiniProgramMessage(e));
-    }
-    console.log('✅ 已初始化小程序消息监听');
-  }
 
-  // 新增：处理小程序消息
-  handleMiniProgramMessage(event) {
-    const { type, data } = event.data;
-    console.log(`📩 收到小程序消息: ${type}`, data);
-
-    // 根据消息类型执行对应操作
-    switch (type) {
-      case 'START_LISTENING':
-        this.startListening(); // 开始语音识别
-        break;
-      case 'STOP_LISTENING':
-        this.stopListening(); // 中断语音识别
-        break;
-      case 'CHANGE_PAGE':
-        this.navigateToPage(data.url); // 跳转页面
-        break;
-      case 'ADJUST_VOLUME':
-        this.setVolume(data.volume); // 调整音量
-        break;
-      case 'TOGGLE_ASSISTANT':
-        this.toggleAssistantVisibility(); // 显示/隐藏助手面板
-        break;
-      default:
-        console.warn(`⚠️ 未知消息类型: ${type}`);
-    }
-  }
- // 新增：开始监听（语音识别）
-  startListening() {
-    if (this.isListening) {
-      console.log('⏸️ 已在监听中，无需重复开始');
-      return;
-    }
-    if (!this.recognition) {
-      this.initSpeechRecognition(); // 初始化识别器
-      // 延迟启动，确保初始化完成
-      setTimeout(() => this.recognition.start(), 500);
-    } else {
-      this.recognition.start();
-    }
-  }
-
-  // 新增：停止监听（中断语音识别）
-  stopListening() {
-    if (!this.isListening || !this.recognition) return;
-    this.recognition.stop();
-    this.isListening = false;
-    this.stopWaveformAnimation();
-    console.log('⏹️ 已停止语音识别');
-    this.updateUI('idle', '已中断识别');
-  }
-// 新增：跳转页面（修改 iframe  src）
-navigateToPage(url) {
-  if (!url) {
-    console.error('❌ 页面跳转失败：URL 为空');
-    return;
-  }
-  const contentFrame = document.getElementById('contentFrame');
-  if (contentFrame) {
-    contentFrame.src = url; // 更新 iframe 地址
-    console.log(`🔗 已跳转至页面: ${url}`);
-    // 可选：通知小程序跳转成功
-    this.postMessageToMiniProgram('PAGE_CHANGED', { url });
-  } else {
-    console.error('❌ 未找到 contentFrame 元素');
-  }
-}
-
-// 新增：向小程序发送消息（可选，用于回传状态）
-postMessageToMiniProgram(type, data) {
-  if (window.parent) {
-    window.parent.postMessage({ type, data }, '*'); // 注意：生产环境需限制 origin
-    console.log(`📤 向小程序发送消息: ${type}`, data);
-  }
-}
-
-// 新增：调整音量（支持背景音乐和语音）
-setVolume({ type, value }) {
-  if (value < 0 || value > 1) {
-    console.error('❌ 音量值必须在 0-1 之间');
-    return;
-  }
-  // 调整背景音乐音量
-  if (type === 'background') {
-    const bgMusic = document.getElementById('backgroundMusic');
-    if (bgMusic) {
-      bgMusic.volume = value;
-      console.log(`🔊 背景音乐音量已调整为: ${value}`);
-    }
-  }
-  // 调整语音播报音量（需结合语音合成逻辑）
-  else if (type === 'speech') {
-    this.speechVolume = value; // 存储音量值，在语音合成时使用
-    console.log(`🔊 语音播报音量已调整为: ${value}`);
-  }
-}
-// 新增：切换助手面板可见性
-toggleAssistantVisibility() {
-  const container = document.getElementById('assistantContainer');
-  if (container) {
-    const isHidden = container.style.display === 'none' || !container.style.display;
-    container.style.display = isHidden ? 'block' : 'none';
-    console.log(`🖥️ 助手面板已${isHidden ? '显示' : '隐藏'}`);
-  } else {
-    console.error('❌ 未找到 assistantContainer 元素');
-  }
-}
 
     // 2.初始化语音识别 - 设置语音识别功能
     initSpeechRecognition() {
@@ -725,41 +597,72 @@ stopListeningDueToInactivity() {
                 });
             }
     // 11.处理命令 - 异步方法，解析并执行用户指令。
-            // 原代码中直接调用API的部分替换为：
-async processCommand(command) {
-  this.isProcessing = true;
-  this.updateUI('processing', '正在处理...');
-  
-  this.conversationHistory.push({
-    role: "user",
-    content: command
-  });
-  
-  // 调用云函数处理对话
-  wx.cloud.callFunction({
-    name: 'voiceAssistant',
-    data: {
-      action: 'processConversation',
-      data: this.conversationHistory
-    }
-  }).then(res => {
-    if (res.result.code === 0) {
-      const assistantMessage = res.result.data;
-      this.conversationHistory.push(assistantMessage);
-      this.showMessage(assistantMessage.content, 'assistant');
-      this.speak(assistantMessage.content);
-    } else {
-      this.showMessage('处理失败: ' + res.result.message, 'error');
-    }
-    this.isProcessing = false;
-    this.updateUI('listening', '正在聆听...');
-  }).catch(err => {
-    console.error('调用云函数失败:', err);
-    this.showMessage('服务连接失败，请重试', 'error');
-    this.isProcessing = false;
-    this.updateUI('idle', '点击麦克风开始');
-  });
-}
+            async processCommand(command) {
+                console.log('处理命令:', command);
+                
+                if (this.isProcessing) {
+                    console.log('正在处理其他命令，跳过');
+                    return;
+                }
+                
+                this.isProcessing = true;
+                this.updateUI('processing', '思考中...');
+                
+                // 检查预设命令
+                const presetResponse = this.checkPresetCommands(command);
+                if (presetResponse) {
+                    console.log('使用预设回复');
+                    this.showMessage(presetResponse, 'assistant');
+                    await this.speak(presetResponse);
+                    this.isProcessing = false;
+                    this.updateUI('idle', '准备就绪');
+                    
+                    // 预设命令处理完后恢复监听
+                    if (this.shouldKeepListening) {
+                        setTimeout(() => this.startListening(), 1000);
+                    }
+                    return;
+                }
+                
+                console.log('调用API处理命令');
+                this.showThinking();
+                
+                try {
+                    const response = await this.callDeepSeekAPI(command);
+                    console.log('API回复:', response);
+                    
+                    // 移除思考指示器
+                    const thinkingEl = document.getElementById('thinkingIndicator');
+                    if (thinkingEl) thinkingEl.remove();
+                    
+                    this.showMessage(response, 'assistant');
+                    await this.speak(response);
+                    
+                    // 更新对话历史
+                    this.conversationHistory.push(
+                        { role: 'user', content: command },
+                        { role: 'assistant', content: response }
+                    );
+                    
+                } catch (error) {
+                    console.error('API请求失败:', error);
+                    
+                    const thinkingEl = document.getElementById('thinkingIndicator');
+                    if (thinkingEl) thinkingEl.remove();
+                    
+                    const errorMsg = `处理请求时出错: ${error.message}`;
+                    this.showMessage(errorMsg, 'error');
+                    await this.speak('抱歉，处理您的请求时出现了问题');
+                } finally {
+                    this.isProcessing = false;
+                    this.updateUI('idle', '准备就绪');
+                    
+                    // 处理完后恢复监听
+                    if (this.shouldKeepListening) {
+                        setTimeout(() => this.startListening(), 1000);
+                    }
+                }
+            }
     // 12.加载语音库 - 加载可用的语音合成声音。
     loadVoices() {
         return new Promise(resolve => {
